@@ -1,0 +1,19 @@
+/*----------------------
+Folders Page
+----------------------*/
+#folders ul li span.icon{display:inline-block;height:24px;width:24px;margin-right:10px;vertical-align:middle;}
+#folders ul li span.folder{background:url(../images/ui-mainApp.png) no-repeat 0 0;}
+#folders ul li span.file{background:url(../images/ui-mainApp.png) no-repeat -48px 0;}
+
+/*----------------------
+Files Page
+----------------------*/
+#files ul li span.icon{display:inline-block;height:24px;width:24px;margin-right:10px;vertical-align:middle;}
+#files ul li span.folder{background:url(../images/ui-mainApp.png) no-repeat 0 0;}
+#files ul li span.file{background:url(../images/ui-mainApp.png) no-repeat -48px 0;}
+
+/*----------------------
+Download Page
+----------------------*/
+#download ul li span.icon{display:inline-block;height:24px;width:24px;margin-right:10px;vertical-align:middle;}
+#download ul li span.download{background:url(../images/ui-mainApp.png) no-repeat -48px -24px;}

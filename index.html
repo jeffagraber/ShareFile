@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+    <head>
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,minimum-scale=1 user-scalable=no,width = 320" />
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<link rel="stylesheet" href="assets/jqtouch/jqtouch.css" type="text/css" media="screen" /></div>
+		<link rel="stylesheet" href="assets/css/main.css" type="text/css" media="screen" /></div>
+		<link rel="stylesheet" href="assets/themes/apple/theme.css" type="text/css" media="screen" /></div>
+		<script type="text/javascript" src="assets/jqtouch/jquery-1.6.4.min.js"></script></div>
+		<script type="text/javascript" src="assets/jqtouch/jqtouch.js"></script>
+		<script type="text/javascript" src="assets/js/global.js"></script>
+		<script type="text/javascript" src="assets/js/jquery.jsonp-2.1.4.min.js"></script></div>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				$("#login[type=button]").click(function(){
+					var url = $("input[name=account]").val();
+					var email = $("input[name=email]").val();
+					var password = $("input[name=password]").val();
+					
+					$.ajax({
+						dataType: 'jsonp',
+						jsonpCallback: 'callback',
+						url: 'https://'+url+'.sharefile.com/rest/getAuthID.aspx?username='+email+'&password='+password+'&fmt=jsonp&jsonp_callback=callback&callback=?',
+						context: document.body,
+						success: function (data) {
+							if(data.value){
+								$('#home').removeClass('current');
+								$('#folders').addClass('current');
+								$("input[name=authID]").val(data.value).change();
+							}
+							else {
+								alert("Unable to login.");
+							}
+						},
+					});
+				});
+				
+				$("input[name=authID]").change(function(){
+					var url = $(this).val();
+					var authID = $(this).val();
+					$.ajax({
+						dataType: 'jsonp',
+						jsonpCallback: 'callback',
+						url: 'https://'+url+'.sharefile.com/rest/folder.aspx?authID='+authID+'&op=list&id=root&fmt=jsonp&jsonp_callback=callback&callback=?',
+						context: document.body,
+						success: function (data) {
+							$.each(data.value, function(i,item){
+								$("#folders ul").append("<li><a id=\""+item.id+"\" class=\"item-folder\"><span class=\"icon folder\"></span><span>"+item.displayname+"</span></a></li>");
+							});
+						},
+					});
+				});
+				
+				$("a.item-folder").live('click', function(){
+					var url = $("input[name=account]").val();
+					var authID = $("input[name=authID]").val();
+					var id = $(this).attr('id');
+					$.ajax({
+						dataType: 'jsonp',
+						jsonpCallback: 'callback',
+						url: 'https://'+url+'.sharefile.com/rest/folder.aspx?authID='+authID+'&op=list&id='+id+'&fmt=jsonp&jsonp_callback=callback&callback=?',
+						context: document.body,
+						success: function (data) {
+							if(data.value == ''){
+								alert("This folder is empty");
+							}
+							$("#files ul").empty();
+							$.each(data.value, function(i,item){
+								$("#files ul").append("<li><a id=\""+item.id+"\" class=\"item-"+item.type+"\"><span class=\"icon "+item.type+"\"></span><span>"+item.displayname+"</span></a></li>");
+								$('#folders').removeClass('current');
+								$('#files').addClass('current');
+							});
+						},
+					});
+				});
+				
+				$("a.item-file").live('click', function(){
+					var url = $("input[name=account]").val();
+					var authID = $("input[name=authID]").val();
+					var id = $(this).attr('id');
+					$.ajax({
+						dataType: 'jsonp',
+						jsonpCallback: 'callback',
+						url: 'https://'+url+'.sharefile.com/rest/file.aspx?authID='+authID+'&op=download&id='+id+'&fmt=jsonp&jsonp_callback=callback&callback=?',
+						context: document.body,
+						success: function (data) {
+							$("#files ul").empty();
+							if(data.error == 'true'){
+								alert(data.errorMessage);
+							}
+							$("#download ul").append("<li><a href=\""+data.value+"\"><span class=\"icon download\"></span><span>Download File</span></a></li>");
+							$('#files').removeClass('current');
+							$('#download').addClass('current');
+						},
+					});
+				});
+				
+				$("#files .back").click(function(){
+					$('#folders').addClass('current');
+					$('#files').removeClass('current');
+				});
+				
+				$("#download .back").click(function(){
+					$('#folders').addClass('current');
+					$('#download').removeClass('current');
+				});
+			});
+		</script>
+	</head>
+	<body id="jqt">
+		<div id="home" class="current">
+			<div class="toolbar">
+				<h1>Login</h1>
+			</div>
+			
+		<ul class="form">
+			<li><input type="text" name="account" placeholder="Primary Account" /></li>
+			<li><input type="text" name="email" placeholder="Email Address" /></li>
+			<li><input type="password" name="password" placeholder="Password" /></li>
+			<li><input type="button" class="grayButton" value="Login" id="login" /></li>
+			<input type="hidden" value="null" name="authID" />
+		</ul>
+
+		 <!-- #home close -->
+		 </div>
+		<div id="folders">
+			<div class="toolbar">
+				<h1>Folders</h1>
+			</div>
+			<ul>
+			</ul>
+
+		 <!-- #folders close -->
+		 </div>
+		 
+		<div id="files">
+			<div class="toolbar">
+				<span class="back">Folders</span>
+				<h1>Files</h1>
+			</div>
+			<ul>
+			</ul>
+
+		 <!-- #folders close -->
+		 </div>
+		 
+		 <div id="download">
+			<div class="toolbar">
+				<span class="back">Folders</span>
+				<h1>Download</h1>
+			</div>
+			<ul>
+			</ul>
+
+		 <!-- #folders close -->
+		 </div>
+	</body>
+</html>
